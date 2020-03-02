@@ -56,9 +56,10 @@ func singleXOR(in []byte, key byte) []byte {
 	return res
 }
 
-func findSingleXORKey(in []byte, c map[rune]float64) byte {
+func findSingleXORKey(in []byte, c map[rune]float64) ([]byte, byte, float64) {
 	var lastMaxScore = 0.0
 	var res byte
+	var ans []byte
 	for key := 0; key < 256; key++ {
 		out := singleXOR(in, byte(key))
 		score := scoreEnglishText(string(out), c)
@@ -66,7 +67,8 @@ func findSingleXORKey(in []byte, c map[rune]float64) byte {
 		if score > lastMaxScore {
 			res = byte(key)
 			lastMaxScore = score
+			ans = out
 		}
 	}
-	return res
+	return ans, res, lastMaxScore
 }
