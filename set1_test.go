@@ -3,9 +3,20 @@ package cryptopals
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
+
+func readFile(t *testing.T, name string) []byte {
+	t.Helper()
+	data, err := ioutil.ReadFile(name)
+	if err != nil {
+		t.Fatal("failed to read file:", err)
+	}
+	return data
+}
 
 func hexDecode(t *testing.T, s string) []byte {
 	v, err := hex.DecodeString(s)
@@ -15,10 +26,10 @@ func hexDecode(t *testing.T, s string) []byte {
 	return v
 }
 
-func corpusFromFile(t *testing.T, name string) map[rune]float64 {
+func corpusFromFile(name string) map[rune]float64 {
 	text, err := ioutil.ReadFile(name)
 	if err != nil {
-		t.Fatal("failed to open corpus file", err)
+		panic(fmt.Sprintln("failed to read corpus file:", err))
 	}
 	return buildCorpus(string(text))
 }
@@ -41,10 +52,29 @@ func TestProblem2(t *testing.T) {
 	}
 }
 
+var corpus = corpusFromFile("data/aliceinwonderland.txt")
+
 func TestProblem3(t *testing.T) {
-	c := corpusFromFile(t, "data/aliceinwonderland.txt")
 	decoded := hexDecode(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-	key := findSingleXORKey(decoded, c)
+	decrypted, key, _ := findSingleXORKey(decoded, corpus)
 	t.Logf("Key: %c\n", key)
-	t.Logf(string(singleXOR(decoded, key)))
+	t.Logf("Decrypted: %s", string(decrypted))
+}
+
+func TestProblem4(t *testing.T) {
+	text := readFile(t, "data/4.txt")
+
+	var maxScore float64
+	var cipher string
+	var plaintext []byte
+	for _, line := range strings.Split(string(text), "\n") {
+		plain, _, score := findSingleXORKey(hexDecode(t, line), corpus)
+		if score > maxScore {
+			cipher = line
+			plaintext = plain
+			maxScore = score
+		}
+	}
+	t.Logf("Ciphertext: %s\n", cipher)
+	t.Logf("Plaintext: %s\n", plaintext)
 }
