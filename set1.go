@@ -72,3 +72,11 @@ func findSingleXORKey(in []byte, c map[rune]float64) ([]byte, byte, float64) {
 	}
 	return ans, res, lastMaxScore
 }
+
+func repeatingKeyXOR(text []byte, key string) []byte {
+	res := make([]byte, len(text))
+	for i := range text {
+		res[i] = text[i] ^ key[i%len(key)]
+	}
+	return res
+}
