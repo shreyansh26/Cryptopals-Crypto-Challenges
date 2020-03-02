@@ -81,7 +81,7 @@ func TestProblem4(t *testing.T) {
 
 func TestProblem5(t *testing.T) {
 	text := readFile(t, "data/5.txt")
-
 	res := repeatingKeyXOR(text, "ICE")
+
 	t.Logf("Result: %x\n", res)
 }
