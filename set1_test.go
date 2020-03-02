@@ -2,8 +2,9 @@ package cryptopals
 
 import (
 	"bytes"
-	"testing"
 	"encoding/hex"
+	"io/ioutil"
+	"testing"
 )
 
 func hexDecode(t *testing.T, s string) []byte {
@@ -12,6 +13,14 @@ func hexDecode(t *testing.T, s string) []byte {
 		t.Fatal("failed to decode hex: ", s)
 	}
 	return v
+}
+
+func corpusFromFile(t *testing.T, name string) map[rune]float64 {
+	text, err := ioutil.ReadFile(name)
+	if err != nil {
+		t.Fatal("failed to open corpus file", err)
+	}
+	return buildCorpus(string(text))
 }
 
 func TestProblem1(t *testing.T) {
@@ -30,4 +39,12 @@ func TestProblem2(t *testing.T) {
 	if !bytes.Equal(res, hexDecode(t, "746865206b696420646f6e277420706c6179")) {
 		t.Errorf("wrong string %x", res)
 	}
+}
+
+func TestProblem3(t *testing.T) {
+	c := corpusFromFile(t, "data/aliceinwonderland.txt")
+	decoded := hexDecode(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+	key := findSingleXORKey(decoded, c)
+	t.Logf("Key: %c\n", key)
+	t.Logf(string(singleXOR(decoded, key)))
 }
