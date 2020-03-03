@@ -2,6 +2,7 @@ package cryptopals
 
 import (
 	"bytes"
+	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -42,6 +43,13 @@ func decodeBase64(t *testing.T, s string) []byte {
 		t.Fatal("failed to decode base64:", s)
 	}
 	return v
+}
+
+func fatalIfErr(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestProblem1(t *testing.T) {
@@ -111,4 +119,14 @@ func TestProblem6(t *testing.T) {
 	t.Logf("likely key: %q", key)
 
 	t.Logf("Result: %s", repeatingKeyXOR(text, key))
+}
+
+func TestProblem7(t *testing.T) {
+	text := decodeBase64(t, string(readFile(t, "data/7.txt")))
+
+	b, err := aes.NewCipher([]byte("YELLOW SUBMARINE"))
+	fatalIfErr(t, err)
+	out := decryptAESECB(text, b)
+
+	t.Logf("Result: %s", out)
 }
