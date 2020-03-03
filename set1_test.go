@@ -130,3 +130,15 @@ func TestProblem7(t *testing.T) {
 
 	t.Logf("Result: %s", out)
 }
+
+func TestProblem8(t *testing.T) {
+	text := readFile(t, "data/8.txt")
+
+	for i, line := range strings.Split(string(text), "\n") {
+		ans := detectAESECB(hexDecode(t, line), 16)
+		if ans {
+			t.Logf("Ciphertext number %d is encrypted with ECB", i+1)
+			t.Logf("Ciphertext: %s", line)
+		}
+	}
+}
