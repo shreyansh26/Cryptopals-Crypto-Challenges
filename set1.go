@@ -139,3 +139,18 @@ func decryptAESECB(text []byte, b cipher.Block) []byte {
 	}
 	return out
 }
+
+func detectAESECB(in []byte, blockSize int) bool {
+	if len(in)%blockSize != 0 {
+		panic("decryptAESECB: length not a multiple of blockSize")
+	}
+	seen := make(map[string]struct{})
+	for i := 0; i < len(in); i += blockSize {
+		val := string(in[i : i+blockSize])
+		if _, ok := seen[val]; ok {
+			return true
+		}
+		seen[val] = struct{}{}
+	}
+	return false
+}
