@@ -2,6 +2,7 @@ package cryptopals
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -32,6 +33,15 @@ func corpusFromFile(name string) map[rune]float64 {
 		panic(fmt.Sprintln("failed to read corpus file:", err))
 	}
 	return buildCorpus(string(text))
+}
+
+func decodeBase64(t *testing.T, s string) []byte {
+	t.Helper()
+	v, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		t.Fatal("failed to decode base64:", s)
+	}
+	return v
 }
 
 func TestProblem1(t *testing.T) {
@@ -81,7 +91,24 @@ func TestProblem4(t *testing.T) {
 
 func TestProblem5(t *testing.T) {
 	text := readFile(t, "data/5.txt")
-	res := repeatingKeyXOR(text, "ICE")
-
+	res := repeatingKeyXOR(text, []byte("ICE"))
+	if !bytes.Equal(res, hexDecode(t, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")) {
+		t.Errorf("wrong result: %x", res)
+	}
 	t.Logf("Result: %x\n", res)
+}
+
+func TestProblem6(t *testing.T) {
+	distance := getHammingDistance([]byte("this is a test"), []byte("wokka wokka!!!"))
+	if distance != 37 {
+		t.Errorf("wrong Hamming distance: %d", distance)
+	}
+
+	text := decodeBase64(t, string(readFile(t, "data/6.txt")))
+	t.Log("likely size: ", findrepeatingKeyXORSize(text))
+
+	key := findrepeatingKeyXORKey(text, corpus)
+	t.Logf("likely key: %q", key)
+
+	t.Logf("Result: %s", repeatingKeyXOR(text, key))
 }
