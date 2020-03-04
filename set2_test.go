@@ -28,3 +28,18 @@ func TestProblem10(t *testing.T) {
 	decoded := decryptCBC(data, b, iv)
 	t.Logf("Result: %s", decoded)
 }
+
+func TestProblem11(t *testing.T) {
+	oracle := newECBCBCOracle()
+	payload := bytes.Repeat([]byte{42}, 16*3)
+	cbc, ecb := 0, 0
+	for i := 0; i < 1000; i++ {
+		out := oracle(payload)
+		if detectAESECB(out, 16) {
+			ecb++
+		} else {
+			cbc++
+		}
+	}
+	t.Log(ecb, cbc)
+}
